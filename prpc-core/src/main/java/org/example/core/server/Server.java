@@ -1,7 +1,6 @@
 package org.example.core.server;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -11,7 +10,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.core.common.RpcEncoder;
 import org.example.core.common.config.ServerConfig;
+import org.example.core.common.RpcDecoder;
 
 import static org.example.core.common.cache.CommonServerCache.PROVIDER_CLASS_MAP;
 
@@ -72,6 +73,7 @@ public class Server {
         server.setServerConfig(config);
         server.registyService(new DataServiceImpl());
         server.startApplication();
+
     }
 
 }
