@@ -1,6 +1,7 @@
 package org.example.core.registry;
 
 import lombok.Data;
+import org.example.core.registry.zookeeper.ProviderNodeInfo;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -53,6 +54,8 @@ public class URL {
         String[] items = providerNodeStr.split("/");
         ProviderNodeInfo providerNodeInfo = new ProviderNodeInfo();
         //TODO providerNodeInfo setServiceName 和 setAddress
+        providerNodeInfo.setServiceName(items[2]);
+        providerNodeInfo.setAddress(items[4]);
         return providerNodeInfo;
     }
 }

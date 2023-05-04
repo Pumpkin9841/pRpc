@@ -13,5 +13,5 @@ public class ChannelFutureWrapper {
 
     private String host;
 
-    private String port;
+    private Integer port;
 }
