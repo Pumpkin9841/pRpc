@@ -13,5 +13,9 @@ public class ClientConfig {
     /**
      * 目标服务器ip地址
      */
-    private String serverAddr;
+    private String registerAddr;
+
+    private String applicationName;
+
+    private String proxyType;
 }

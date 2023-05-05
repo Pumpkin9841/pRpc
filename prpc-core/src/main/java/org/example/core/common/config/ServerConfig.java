@@ -18,4 +18,8 @@ public class ServerConfig {
      */
     private Integer port;
 
+    private String registerAddr;
+
+    private String applicationName;
+
 }

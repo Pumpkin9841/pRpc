@@ -11,10 +11,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.core.common.RpcEncoder;
+import org.example.core.common.config.PropertiesBootstrap;
 import org.example.core.common.config.ServerConfig;
 import org.example.core.common.RpcDecoder;
+import org.example.core.common.utils.CommonUtils;
+import org.example.core.registry.RegistryService;
+import org.example.core.registry.URL;
 
 import static org.example.core.common.cache.CommonServerCache.PROVIDER_CLASS_MAP;
+import static org.example.core.common.cache.CommonServerCache.PROVIDER_URL_SET;
 
 /**
  * @Author zhoufan
@@ -28,6 +33,8 @@ public class Server {
     private EventLoopGroup workerGroup = null;
 
     private ServerConfig serverConfig;
+
+    private RegistryService registryService;
 
     public void startApplication() throws InterruptedException {
         bossGroup = new NioEventLoopGroup();
@@ -51,10 +58,33 @@ public class Server {
                                 .addLast(new ServerHandler());
                     }
                 });
+        this.batchExportUrl();
         serverBootstrap.bind(serverConfig.getPort()).sync();
     }
 
-    public void registyService(Object serviceBean){
+    private void batchExportUrl() {
+        Thread task = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2500);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                for(URL url : PROVIDER_URL_SET) {
+                    registryService.register(url);
+                }
+            }
+        });
+        task.start();
+    }
+
+    public void initServerConfig() {
+        ServerConfig serverConfig = PropertiesBootstrap.loadServerConfigFromLocal();
+        this.serverConfig = serverConfig;
+    }
+
+    public void exportService(Object serviceBean){
         Class<?>[] classes = serviceBean.getClass().getInterfaces();
         if(classes.length == 0) {
             throw new RuntimeException("注册服务失败，服务必须实现接口");
@@ -64,14 +94,18 @@ public class Server {
         }
         String serviceName = classes[0].getName();
         PROVIDER_CLASS_MAP.put(serviceName, serviceBean);
+        URL url = new URL();
+        url.setServiceName(classes[0].getName());
+        url.setApplicationName(serverConfig.getApplicationName());
+        url.addParameter("host", CommonUtils.getIpAddress());
+        url.addParameter("port", String.valueOf(serverConfig.getPort()));
+        PROVIDER_URL_SET.add(url);
     }
 
     public static void main(String[] args) throws InterruptedException {
         Server server = new Server();
-        ServerConfig config = new ServerConfig();
-        config.setPort(9090);
-        server.setServerConfig(config);
-        server.registyService(new DataServiceImpl());
+        server.initServerConfig();
+        server.exportService(new DataServiceImpl());
         server.startApplication();
 
     }
