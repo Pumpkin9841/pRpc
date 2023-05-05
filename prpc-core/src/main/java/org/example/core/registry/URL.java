@@ -53,7 +53,6 @@ public class URL {
     public static ProviderNodeInfo buildURLFromUrlStr(String providerNodeStr) {
         String[] items = providerNodeStr.split("/");
         ProviderNodeInfo providerNodeInfo = new ProviderNodeInfo();
-        //TODO providerNodeInfo setServiceName 和 setAddress
         providerNodeInfo.setServiceName(items[2]);
         providerNodeInfo.setAddress(items[4]);
         return providerNodeInfo;
